@@ -1,7 +1,6 @@
 package com.example.smart_waiting.user.service;
 
 import com.example.smart_waiting.components.MailComponents;
-import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.model.UserDto;
@@ -24,7 +23,7 @@ public class UserServiceImpl implements UserService{
     private final MailComponents mailComponents;
 
     @Override
-    public ServiceResult createUser(UserInput userInput) {
+    public UserDto createUser(UserInput userInput) {
 
         Optional<User> optionalUser = userRepository.findById(userInput.getEmail());
 
@@ -52,6 +51,6 @@ public class UserServiceImpl implements UserService{
 //                + "<div><a target='_blank' href='http://localhost:8080/member/email-auth?id=" + uuid + "'> 가입 완료 </a></div>";
 //        mailComponents.sendMail(email, subject, text);
 
-        return ServiceResult.success();
+        return UserDto.of(user);
     }
 }
