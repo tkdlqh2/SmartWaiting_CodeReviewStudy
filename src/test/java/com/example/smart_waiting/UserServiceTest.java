@@ -79,5 +79,6 @@ public class UserServiceTest {
         //then
         verify(userRepository,times(0)).save(captor.capture());
         assertFalse(serviceResult.isSuccess());
+        assertEquals("이미 존재하는 이메일입니다.",serviceResult.getErrorCode());
     }
 }
