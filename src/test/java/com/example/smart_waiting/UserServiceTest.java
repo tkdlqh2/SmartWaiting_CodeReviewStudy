@@ -1,5 +1,11 @@
 package com.example.smart_waiting;
 
+import com.example.smart_waiting.user.User;
+import com.example.smart_waiting.user.model.UserDto;
+import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.repository.UserRepository;
+import com.example.smart_waiting.user.service.UserService;
+import com.example.smart_waiting.user.service.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -7,10 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -19,7 +24,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private UserService userService;
+    private UserServiceImpl userService;
 
     @Test
     void createUserSuccess(){
@@ -27,7 +32,8 @@ public class UserServiceTest {
         UserInput userInput = UserInput.builder()
                 .email("yhj7124@naver.com")
                 .password("1111")
-                .phone("010-1111-2222");
+                .phone("010-1111-2222")
+                .build();
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
@@ -35,9 +41,8 @@ public class UserServiceTest {
         UserDto userDto = userService.createUser(userInput);
 
         //then
-        verify(UserRepository,times(1)).save(captor.capture());
+        verify(userRepository,times(1)).save(captor.capture());
         assertEquals("yhj7124@naver.com",userDto.getEmail());
-        assertEquals("1111",userDto.getPassword());
         assertEquals("010-1111-2222",userDto.getPhone());
     }
 
