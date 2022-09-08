@@ -1,5 +1,6 @@
 package com.example.smart_waiting.user.service;
 
+import com.example.smart_waiting.components.MailComponents;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.model.UserDto;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final MailComponents mailComponents;
 
     @Override
     public UserDto createUser(UserInput userInput) {
@@ -35,6 +37,12 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         userRepository.save(user);
+
+        String email = userInput.getEmail();
+        String subject = "Smart Waiting 사이트 가입을 축하드립니다. ";
+        String text = "<p>Smart Waiting 사이트 가입을 축하드립니다.<p><p>아래 링크를 클릭하셔서 가입을 완료 하세요.</p>"
+                + "<div><a target='_blank' href='http://localhost:8080/member/email-auth?id=" + uuid + "'> 가입 완료 </a></div>";
+        mailComponents.sendMail(email, subject, text);
 
         return UserDto.of(user);
     }
