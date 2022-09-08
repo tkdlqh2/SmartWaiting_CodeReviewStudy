@@ -3,9 +3,8 @@ package com.example.smart_waiting.user.service;
 import com.example.smart_waiting.components.MailComponents;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
-import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
-import com.example.smart_waiting.user.repository.UserRepository;
+import com.example.smart_waiting.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
