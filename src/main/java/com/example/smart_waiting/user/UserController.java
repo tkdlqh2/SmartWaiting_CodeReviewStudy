@@ -3,41 +3,38 @@ package com.example.smart_waiting.user;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
 
-    // 회원 가입 폼 이동
-    @GetMapping("/user/userJoinForm.do")
-    public String memberJoinForm() {
-        return "/user/userJoinForm";
+    @GetMapping("/register")
+    public String registerView(){
+        return "user.register";
     }
 
-    // 이메일 중복 검사(AJAX)
-    @PostMapping("/user/check-email.do")
-    public void checkEmail(@RequestParam("email") String email, HttpServletResponse response){
-        userService.checkEmail(email, response);
+    @GetMapping("/check_email.do")
+    public @ResponseBody ResponseEntity<?> existEmail(@RequestParam String email){
+        int result = userService.exsitEmail(email);
+        return ResponseEntity.ok(result);
     }
 
-    // 전화번호 검사(AJAX)
-    @PostMapping("/user/check-phone.do")
-    public void checkPhone(@RequestParam("phone") String phone, HttpServletResponse response) {
-        userService.checkPhone(phone, response);
+    @GetMapping("/check_phone.do")
+    public @ResponseBody ResponseEntity<?> existPhone(@RequestParam String phone){
+        int result = userService.exsitPhone(phone);
+        return ResponseEntity.ok(result);
     }
 
-    // 회원 가입
-    @PostMapping("/user/create-user.do")
-    public String createUser(UserInput userInput) {
-        userService.createUser(userInput);
-        return "redirect:./";
+    @PostMapping("/register")
+    public String register(UserInput userInput){
+        var result = userService.createUser(userInput);
+        return "redirect:/";
     }
+
 }
