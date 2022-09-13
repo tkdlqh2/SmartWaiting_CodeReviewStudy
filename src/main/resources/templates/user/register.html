@@ -26,7 +26,7 @@
 		$("#email").keyup(function() {
 			$.ajax({
 				url : "../member/check_email.do",
-				type : "POST",
+				type : "GET",
 				data : {
 					email : $("#email").val()
 				},
@@ -45,7 +45,7 @@
 		$("#phone").keyup(function(){
 			$.ajax({
 				url : "./check_phone.do",
-				type : "POST",
+				type : "GET",
 				data : {
 					phone : $("#phone").val()
 				},
