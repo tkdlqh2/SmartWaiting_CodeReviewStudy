@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("user")
 public class UserController {
 
     private final UserService userService;
 
     @GetMapping("/register")
     public String registerView(){
-        return "user.register";
+        return "user/register";
     }
 
     @GetMapping("/check_email.do")
