@@ -51,4 +51,37 @@ public class UserServiceTest {
         verify(userRepository,times(1)).save(captor.capture());
     }
 
+    @Test
+    void existsByEmailExist(){
+        //given
+        given(userRepository.existsByEmail("yhj7124@naver.com")).willReturn(true);
+        //when
+        //then
+        assertTrue(userService.existEmail("yhj7124@naver.com"));
+    }
+
+    @Test
+    void existsByEmailNotExist(){
+        //given
+        //when
+        //then
+        assertFalse(userService.existEmail("yhj7124@naver.com"));
+    }
+
+    @Test
+    void existsByPhoneExists(){
+        //given
+        given(userRepository.existsByPhone("010-1111-2222")).willReturn(true);
+        //when
+        //then
+        assertTrue(userService.existPhone("010-1111-2222"));
+    }
+
+    @Test
+    void existsByPhoneNotExist(){
+        //given
+        //when
+        //then
+        assertFalse(userService.existPhone("010-1111-2222"));
+    }
 }
