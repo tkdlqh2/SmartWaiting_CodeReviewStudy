@@ -1,24 +1,19 @@
 package com.example.smart_waiting;
 
-import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.user.User;
+import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserInput;
-import com.example.smart_waiting.user.repository.UserRepository;
 import com.example.smart_waiting.user.service.UserServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -27,6 +22,9 @@ import static org.mockito.Mockito.verify;
 public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -40,14 +38,17 @@ public class UserServiceTest {
                 .phone("010-1111-2222")
                 .build();
 
+        given(passwordEncoder.encode("1111")).willReturn("2222");
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
         //when
-        ServiceResult serviceResult = userService.createUser(userInput);
+        User user = userService.createUser(userInput);
 
         //then
+        assertEquals("yhj7124@naver.com",user.getEmail());
+        assertEquals("2222",user.getPassword());
+        assertEquals("010-1111-2222",user.getPhone());
         verify(userRepository,times(1)).save(captor.capture());
-        assertTrue(serviceResult.isSuccess());
     }
 
 }
