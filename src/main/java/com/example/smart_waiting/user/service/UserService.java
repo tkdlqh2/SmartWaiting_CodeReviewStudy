@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
 
-    User createUser(UserInput userInput);
+    ServiceResult createUser(UserInput userInput);
 
     boolean existEmail(String email);
 

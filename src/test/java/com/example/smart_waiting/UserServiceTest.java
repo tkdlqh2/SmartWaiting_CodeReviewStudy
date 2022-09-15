@@ -1,6 +1,7 @@
 package com.example.smart_waiting;
 
 import com.example.smart_waiting.components.MailComponents;
+import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
@@ -50,12 +51,10 @@ public class UserServiceTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
         //when
-        User user = userService.createUser(userInput);
+        ServiceResult result = userService.createUser(userInput);
 
         //then
-        assertEquals("yhj7124@naver.com",user.getEmail());
-        assertEquals("2222",user.getPassword());
-        assertEquals("010-1111-2222",user.getPhone());
+        assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
     }
 
@@ -108,10 +107,10 @@ public class UserServiceTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
         //when
-        User user = userService.emailAuth("인증키~");
+        ServiceResult result = userService.emailAuth("인증키~");
 
         //then
-        assertEquals(user.getUserStatus(),UserStatus.APPROVED);
+        assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
     }
 }

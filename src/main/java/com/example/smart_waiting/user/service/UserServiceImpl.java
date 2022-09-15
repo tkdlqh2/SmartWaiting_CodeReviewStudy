@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public User createUser(UserInput userInput) {
+    public ServiceResult createUser(UserInput userInput) {
 
         String encryptPassword = passwordEncoder.encode(userInput.getPassword());
         String uuid = UUID.randomUUID().toString();
@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService{
                 + "<div><a target='_blank' href='http://localhost:8080/user/email-auth?id=" + uuid + "'> 가입 완료 </a></div>";
         mailComponents.sendMail(email, subject, text);
 
-        return user;
+        return ServiceResult.success();
     }
 
     @Transactional(readOnly = true)
