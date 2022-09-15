@@ -7,6 +7,7 @@ import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.service.UserServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -101,7 +102,7 @@ public class UserServiceTest {
                         .id(1L)
                         .userStatus(UserStatus.UNAPPROVED)
                         .authKey("인증키~")
-                        .authDate(LocalDateTime.now().minusDays(1))
+                        .authDate(LocalDateTime.now().plusDays(1))
                         .build()));
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
@@ -113,4 +114,39 @@ public class UserServiceTest {
         assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
     }
+
+    @Test
+    @DisplayName("이메일 인증 실패 - 인증키가 존재하지 않음")
+    void emailAuthFailure_noneKey(){
+        //given
+        //when
+        ServiceResult result = userService.emailAuth("인증키~");
+
+        //then
+        assertFalse(result.isSuccess());
+        assertEquals("인증키가 유효하지 않습니다.",result.getMessage());
+    }
+
+    @Test
+    @DisplayName("이메일 인증 실패 - 인증키가 만료됨")
+    void emailAuthFailure_keyExpired(){
+        //given
+        given(userRepository.findByAuthKey("인증키~"))
+                .willReturn(Optional.of(User.builder()
+                        .id(1L)
+                        .userStatus(UserStatus.UNAPPROVED)
+                        .authKey("인증키~")
+                        .authDate(LocalDateTime.now().minusDays(1))
+                        .build()));
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        //when
+        ServiceResult result = userService.emailAuth("인증키~");
+
+        //then
+        assertFalse(result.isSuccess());
+        assertEquals("인증키가 만료되었습니다.",result.getMessage());
+    }
+
 }
