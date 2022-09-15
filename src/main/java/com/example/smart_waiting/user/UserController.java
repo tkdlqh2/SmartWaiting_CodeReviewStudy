@@ -46,6 +46,8 @@ public class UserController {
         String uuid = request.getParameter("id");
 
         ServiceResult result = userService.emailAuth(uuid);
+        model.addAttribute("result",result.isSuccess());
+        model.addAttribute("errorMessage",result.getMessage());
 
         return "user/email_auth";
     }

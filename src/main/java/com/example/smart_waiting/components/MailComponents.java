@@ -6,8 +6,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
 
-import javax.mail.internet.MimeMessage;
-
 @RequiredArgsConstructor
 @Component
 public class MailComponents {
