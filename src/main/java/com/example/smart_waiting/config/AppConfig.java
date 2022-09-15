@@ -1,4 +1,4 @@
-package com.example.smart_waiting;
+package com.example.smart_waiting.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
