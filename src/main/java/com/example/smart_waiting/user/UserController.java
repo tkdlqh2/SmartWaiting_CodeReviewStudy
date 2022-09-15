@@ -5,7 +5,10 @@ import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequiredArgsConstructor
@@ -35,6 +38,15 @@ public class UserController {
     public String register(UserInput userInput){
         userService.createUser(userInput);
         return "redirect:/";
+    }
+
+    @GetMapping("/email-auth")
+    public String emailAuth(Model model, HttpServletRequest request){
+        String uuid = request.getParameter("id");
+
+        userService.emailAuth(uuid);
+
+        return "user/email_auth";
     }
 
 }

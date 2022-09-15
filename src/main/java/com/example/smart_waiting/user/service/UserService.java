@@ -6,10 +6,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface UserService {
+
     User createUser(UserInput userInput);
 
     boolean existEmail(String email);
 
     boolean existPhone(String phone);
+
+    User emailAuth(String uuid);
 
 }
