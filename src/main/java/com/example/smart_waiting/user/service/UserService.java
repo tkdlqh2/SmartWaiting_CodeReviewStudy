@@ -1,5 +1,6 @@
 package com.example.smart_waiting.user.service;
 
+import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.model.UserInput;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,6 @@ public interface UserService {
 
     boolean existPhone(String phone);
 
-    User emailAuth(String uuid);
+    ServiceResult emailAuth(String uuid);
 
 }

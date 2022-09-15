@@ -1,5 +1,6 @@
 package com.example.smart_waiting.user;
 
+import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,7 @@ public class UserController {
     public String emailAuth(Model model, HttpServletRequest request){
         String uuid = request.getParameter("id");
 
-        userService.emailAuth(uuid);
+        ServiceResult result = userService.emailAuth(uuid);
 
         return "user/email_auth";
     }

@@ -1,6 +1,7 @@
 package com.example.smart_waiting.user.service;
 
 import com.example.smart_waiting.components.MailComponents;
+import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private final MailComponents mailComponents;
 
+    @Transactional
     @Override
     public User createUser(UserInput userInput) {
 
@@ -50,28 +53,33 @@ public class UserServiceImpl implements UserService{
         return user;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean existEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean existPhone(String phone) {
         return userRepository.existsByPhone(phone);
     }
 
-    // 회원 가입 신청을 넣고 인증을 하지 않은 사용자에 대한 처리 필요!
+    // 회원 가입 신청을 넣고 인증기한이 만료된 사용자에 대한 처리 필요!
+    @Transactional
     @Override
-    public User emailAuth(String uuid) {
+    public ServiceResult emailAuth(String uuid) {
         Optional<User> optionalUser = userRepository.findByAuthKey(uuid);
         if(!optionalUser.isPresent()){
             // 인증키가 유효하지 않음!
+            return ServiceResult.fail("인증키가 유효하지 않습니다.");
         }
 
         User user = optionalUser.get();
 
         if(user.getAuthDate().isAfter(LocalDateTime.now())){
             // 만료된 인증키!
+            return ServiceResult.fail("인증키가 만료되었습니다.");
         }
 
         user.setUserStatus(UserStatus.APPROVED);
@@ -79,6 +87,6 @@ public class UserServiceImpl implements UserService{
         user.setAuthDate(null);
         userRepository.save(user);
 
-        return user;
+        return ServiceResult.success();
     }
 }
