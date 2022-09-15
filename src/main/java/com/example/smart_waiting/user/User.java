@@ -24,6 +24,8 @@ public class User {
     private String email;
 
     private String password;
+
+    @Column(name = "phone", nullable = false,unique = true)
     private String phone;
 
     private String authKey;
