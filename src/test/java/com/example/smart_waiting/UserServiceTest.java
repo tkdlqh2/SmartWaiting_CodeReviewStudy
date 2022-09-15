@@ -1,6 +1,7 @@
 package com.example.smart_waiting;
 
 import com.example.smart_waiting.components.MailComponents;
+import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserInput;
@@ -12,6 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,6 +80,7 @@ public class UserServiceTest {
     void existsByPhoneExists(){
         //given
         given(userRepository.existsByPhone("010-1111-2222")).willReturn(true);
+
         //when
         //then
         assertTrue(userService.existPhone("010-1111-2222"));
@@ -87,5 +92,26 @@ public class UserServiceTest {
         //when
         //then
         assertFalse(userService.existPhone("010-1111-2222"));
+    }
+
+    @Test
+    void emailAuthSuccess(){
+        //given
+        given(userRepository.findByAuthKey("인증키~"))
+                .willReturn(Optional.of(User.builder()
+                        .id(1L)
+                        .userStatus(UserStatus.UNAPPROVED)
+                        .authKey("인증키~")
+                        .authDate(LocalDateTime.now().minusDays(1))
+                        .build()));
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        //when
+        User user = userService.emailAuth("인증키~");
+
+        //then
+        assertEquals(user.getUserStatus(),UserStatus.APPROVED);
+        verify(userRepository,times(1)).save(captor.capture());
     }
 }
