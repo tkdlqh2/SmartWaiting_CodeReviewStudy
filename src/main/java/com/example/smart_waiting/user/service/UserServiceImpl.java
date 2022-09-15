@@ -70,14 +70,14 @@ public class UserServiceImpl implements UserService{
     @Override
     public ServiceResult emailAuth(String uuid) {
         Optional<User> optionalUser = userRepository.findByAuthKey(uuid);
-        if(!optionalUser.isPresent()){
+        if(optionalUser.isEmpty()){
             // 인증키가 유효하지 않음!
             return ServiceResult.fail("인증키가 유효하지 않습니다.");
         }
 
         User user = optionalUser.get();
 
-        if(user.getAuthDate().isAfter(LocalDateTime.now())){
+        if(user.getAuthDate().isBefore(LocalDateTime.now())){
             // 만료된 인증키!
             return ServiceResult.fail("인증키가 만료되었습니다.");
         }
