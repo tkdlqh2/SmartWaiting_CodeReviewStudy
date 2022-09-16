@@ -1,6 +1,6 @@
 package com.example.smart_waiting;
 
-import com.example.smart_waiting.components.MailComponents;
+import com.example.smart_waiting.components.MailSenderAdapter;
 import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
@@ -34,7 +34,7 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private MailComponents mailComponents;
+    private MailSenderAdapter mailSenderAdapter;
 
     @InjectMocks
     private UserServiceImpl userService;

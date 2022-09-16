@@ -28,6 +28,7 @@ public class User {
     @Column(name = "phone", nullable = false,unique = true)
     private String phone;
 
+    @Column(name = "auth_key",unique = true)
     private String authKey;
     private LocalDateTime authDate;
 

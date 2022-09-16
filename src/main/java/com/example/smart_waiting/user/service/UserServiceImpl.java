@@ -1,6 +1,6 @@
 package com.example.smart_waiting.user.service;
 
-import com.example.smart_waiting.components.MailComponents;
+import com.example.smart_waiting.components.MailSenderAdapter;
 import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
@@ -8,7 +8,6 @@ import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserInput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +23,10 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     @Autowired
-    private final MailComponents mailComponents;
+    private final MailSenderAdapter mailSenderAdapter;
 
+
+    //이후에 비동기 처리로 변경 필요해보임!!
     @Transactional
     @Override
     public ServiceResult createUser(UserInput userInput) {
@@ -48,7 +49,7 @@ public class UserServiceImpl implements UserService{
         String subject = "Smart Waiting 사이트 가입을 축하드립니다. ";
         String text = "<p>Smart Waiting 사이트 가입을 축하드립니다.<p><p>아래 링크를 클릭하셔서 가입을 완료 하세요.</p>"
                 + "<div><a target='_blank' href='http://localhost:8080/user/email-auth?id=" + uuid + "'> 가입 완료 </a></div>";
-        mailComponents.sendMail(email, subject, text);
+        mailSenderAdapter.sendMail(email, subject, text);
 
         return ServiceResult.success();
     }
