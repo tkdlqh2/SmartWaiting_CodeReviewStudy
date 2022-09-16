@@ -1,6 +1,7 @@
 package com.example.smart_waiting.security;
 
 import com.example.smart_waiting.user.service.UserService;
+import com.example.smart_waiting.user.service.UserServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -22,7 +23,7 @@ public class TokenProvider {
     private static final long TOKEN_EXPIRE_TIME = 1000*60*60*24; //1DAY
     private static final String KEY_ROLES = "roles";
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @Value("{spring.jwt.secret}")
     private String secretKey;
@@ -44,11 +45,11 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String jwt){
 
-        UserDetails userDetails = userService.loadUserByUsername(getUsername(jwt));
+        UserDetails userDetails = userService.loadUserByUsername(getEmail(jwt));
         return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
     }
 
-    public String getUsername(String token){
+    public String getEmail(String token){
         return this.parseClaims(token).getSubject();
     }
 
