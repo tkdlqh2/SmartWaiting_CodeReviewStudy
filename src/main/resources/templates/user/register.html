@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script>
+	$(function(){
+	    console.log("hello");
+        $("#email_check").on('click',function(){
+            const reg3 =  /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/
+            if(!reg3.test($("#email").val())){
+                $("#email_check_result").html("패턴에 맞게 입력해주세요.");
+                return false;
+            } else{
+                $.ajax({
+                    url : "./check_email.do",
+                    type : "GET",
+                    data : {
+                        email : $("#email").val()
+                    },
+                    success : function(result) {
+                        if (result) {
+                            $("#email_check_result").html("중복된 이메일이 있습니다.");
+                        } else {
+                            $("#email_check_result").html("사용가능합니다.");
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#phone_check").on('click',function(){
+            const reg2 = /^\d{3}-\d{3,4}-\d{4}$/;
+            if(!reg2.test($("#phone").val())){
+                $("#phone_check_result").html("패턴에 맞게 입력해주세요.");
+            } else{
+                $.ajax({
+                url : "./check_phone.do",
+                type : "GET",
+                data : {
+                    phone : $("#phone").val()
+                },
+                success : function(result) {
+                        if (result) {
+                            $("#phone_check_result").html("중복된 전화번호가 있습니다.");
+                        } else {
+                            $("#phone_check_result").html("사용가능합니다.");
+                        }
+                    }
+                });
+            }
+        });
+
+		$("#joinForm").submit(function(){
+		    if($("#email_check_result").html() != "사용가능합니다."){
+		        console.log($("#email_check_result").html());
+		        alert("이메일을 먼저 인증해주세요.");
+		        return false;
+		    }
+
+            if($("#phone_check_result").html() != "사용가능합니다."){
+		        alert("핸드폰을 먼저 인증해주세요.");
+		        return false;
+		    }
+
+		    const reg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+			if($("#pw").val() !== $("#pw2").val()){
+				alert("비밀번호가 다릅니다.");
+				$("#pw").val("").focus();
+				$("#pw2").val("");
+				return false;
+			}else if (!reg.test($("#pw").val())) {
+				alert("하나 이상의 대문자, 소문자, 숫자, 특수문자를 포함한 8자리 이상의 비밀번호를 설정해주세요");
+				$("#pw").val("").focus();
+				return false;
+			}
+		});
+	});
+    </script>
+</head>
+<body>
+<div>
+    <div>
+        <div>
+            <h3>Member Join Form</h3>
+        </div>
+        <div>
+            <form id="joinForm" action="./register" method="post">
+                <p>
+                    <label>Email</label>
+                    <input type="email" id="email" name="email" required placeholder="이메일 인증 후 로그인이 가능합니다.">
+                    <input type="button" id="email_check" value="중복 검사"/>
+                    <span id="email_check_result"></span>
+                </p>
+                <p>
+                    <label>Password</label>
+                    <input id="pw" name="password" type="password" required>
+                </p>
+                <p>
+                    <label>Confirm</label>
+                    <input id="pw2" type="password" required>
+                </p>
+                <p>
+                    <label>Phone</label>
+                    <input type="tel" id="phone" name="phone" placeholder="010-1111-2222" required >
+                    <input type="button" id="phone_check" value="중복 검사"/>
+                    <span id="phone_check_result"></span>
+                </p>
+                <p>
+                    <button type="submit" id="joinBtn">Join</button>
+                    <button type="button" onclick="history.go(-1);">Cancel</button>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
