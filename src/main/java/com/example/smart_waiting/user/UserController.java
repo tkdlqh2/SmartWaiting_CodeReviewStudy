@@ -1,14 +1,10 @@
 package com.example.smart_waiting.user;
 
 import com.example.smart_waiting.domain.ServiceResult;
-import com.example.smart_waiting.security.TokenProvider;
-import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
-import com.example.smart_waiting.user.model.UserLoginInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     private final UserService userService;
-    private final TokenProvider tokenProvider;
 
     @GetMapping("/register")
     public String registerView(){
@@ -55,22 +50,6 @@ public class UserController {
         model.addAttribute("errorMessage",result.getMessage());
 
         return "user/email_auth";
-    }
-
-    @GetMapping("/loginForm")
-    public String loginForm(HttpServletRequest request){
-        String uri = request.getHeader("Referer");
-        if (uri != null && !uri.contains("/login")) {
-            request.getSession().setAttribute("prevPage", uri);
-        }
-        return "user/loginForm";
-    }
-
-    @PostMapping("/login-proc")
-    public String loginProc(UserLoginInput parameter){
-        UserDto user = userService.login(parameter);
-        tokenProvider.generateToken(user.getEmail(),user.getUserRoles());
-        return"redirect:/";
     }
 
 }
