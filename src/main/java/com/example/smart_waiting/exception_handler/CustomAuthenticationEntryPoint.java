@@ -1,6 +1,6 @@
 package com.example.smart_waiting.exception_handler;
 
-import com.example.smart_waiting.domain.EntryPointErrorResponse;
+import com.example.smart_waiting.domain.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -15,12 +15,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        EntryPointErrorResponse entryPointErrorResponse = new EntryPointErrorResponse();
-        entryPointErrorResponse.setMsg("인증이 실패하였습니다.");
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMsg("인증이 실패하였습니다.");
 
         response.setStatus(401);
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
-        response.getWriter().write(objectMapper.writeValueAsString(entryPointErrorResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }

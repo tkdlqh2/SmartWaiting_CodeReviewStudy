@@ -1,8 +1,16 @@
 package com.example.smart_waiting.exception;
 
-public class PasswordNotMatchException extends RuntimeException{
-    private static final String MESSAGE= "비밀번호가 일치하지 않습니다.";
+import org.springframework.http.HttpStatus;
 
-    public PasswordNotMatchException(){super(MESSAGE);}
+public class PasswordNotMatchException extends AbstractException{
 
+    @Override
+    public int getStatusCode() {
+        return HttpStatus.BAD_REQUEST.value();
+    }
+
+    @Override
+    public String getMessage() {
+        return "비밀번호가 일치하지 않습니다.";
+    }
 }
