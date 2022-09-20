@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>로그인 페이지</title>
@@ -10,6 +10,7 @@
     <form action="/auth/login-proc" method="post">
         <input type="text" name="email" placeholder="someone@example.com"/><br/>
         <input type="password" name="password" placeholder="password"/><br/>
+        <span th:text="${error}"></span>
         <button type="submit">로그인</button>
     </form>
     <a href="/user/register">회원 가입 페이지</a>
