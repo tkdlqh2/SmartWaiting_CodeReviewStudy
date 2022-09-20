@@ -1,5 +1,6 @@
 package com.example.smart_waiting.security;
 
+import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.service.UserServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,17 +12,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class TokenProvider {
+public class TokenUtil {
 
     private static final long TOKEN_EXPIRE_TIME = 1000*60*60*24; //1DAY
     private static final String KEY_ROLES = "roles";
+    public static final String TOKEN_HEADER = "Authorization";
+    public static final String TOKEN_PREFIX = "Bearer ";
 
     private final UserServiceImpl userService;
 
@@ -66,5 +71,15 @@ public class TokenProvider {
         } catch (ExpiredJwtException e){
             return e.getClaims();
         }
+    }
+
+    public String resolveTokenFromRequest(HttpServletRequest request){
+        String token  = request.getHeader(TOKEN_HEADER);
+
+        if(!ObjectUtils.isEmpty(token) && token.startsWith(TOKEN_PREFIX)){
+            return token.substring(TOKEN_PREFIX.length());
+        }
+
+        return null;
     }
 }
