@@ -1,5 +1,7 @@
 package com.example.smart_waiting.config;
 
+import com.example.smart_waiting.exception_handler.CustomAccessDeniedHandler;
+import com.example.smart_waiting.exception_handler.CustomAuthenticationEntryPoint;
 import com.example.smart_waiting.security.JwtAuthenticationFilter;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,10 @@ public class SecurityConfig{
                 .and()
                 .authorizeRequests()
                 .antMatchers("/user/**").permitAll()
+                .and()
+                .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
+                .and()
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .and()
                 .addFilterBefore(this.authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
