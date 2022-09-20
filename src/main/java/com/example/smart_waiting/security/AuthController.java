@@ -21,10 +21,6 @@ public class AuthController {
 
     @GetMapping("/loginForm")
     public String loginForm(HttpServletRequest request){
-        String uri = request.getHeader("Referer");
-        if (uri != null && !uri.contains("/login")) {
-            request.getSession().setAttribute("prevPage", uri);
-        }
         return "user/loginForm";
     }
 
