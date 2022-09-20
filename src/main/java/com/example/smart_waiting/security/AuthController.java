@@ -1,10 +1,13 @@
 package com.example.smart_waiting.security;
 
+import com.example.smart_waiting.exception.PasswordNotMatchException;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserLoginInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +28,18 @@ public class AuthController {
     }
 
     @PostMapping("/login-proc")
-    public String loginProc(UserLoginInput parameter){
-        UserDto user = userService.login(parameter);
+    public String loginProc(Model model, UserLoginInput parameter){
+        UserDto user;
+        try {
+            user = userService.login(parameter);
+        } catch (PasswordNotMatchException e){
+            model.addAttribute("error",e.getMessage());
+            return "user/loginForm";
+        } catch (UsernameNotFoundException e){
+            model.addAttribute("error",e.getMessage());
+            return "user/loginForm";
+        }
+
         tokenProvider.generateToken(user.getEmail(),user.getUserRoles());
         return"redirect:/";
     }
