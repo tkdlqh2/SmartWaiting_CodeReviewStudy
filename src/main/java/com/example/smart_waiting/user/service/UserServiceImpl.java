@@ -2,18 +2,23 @@ package com.example.smart_waiting.user.service;
 
 import com.example.smart_waiting.components.MailComponents;
 import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.exception.PasswordNotMatchException;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.model.UserLoginInput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +37,8 @@ public class UserServiceImpl implements UserService{
 
         String encryptPassword = passwordEncoder.encode(userInput.getPassword());
         String uuid = UUID.randomUUID().toString();
+        List<String> userRoleList = new ArrayList<>();
+        userRoleList.add("normal");
 
         User user = User.builder()
                 .email(userInput.getEmail())
@@ -40,6 +47,7 @@ public class UserServiceImpl implements UserService{
                 .authKey(uuid)
                 .authDate(LocalDateTime.now().plusDays(3))
                 .userStatus(UserStatus.UNAPPROVED)
+                .userRoles(userRoleList)
                 .build();
 
         userRepository.save(user);
@@ -88,5 +96,24 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
 
         return ServiceResult.success();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        return userRepository.findByEmail(username).orElseThrow(
+                ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+username));
+    }
+
+    @Override
+    public User login(UserLoginInput parameter) {
+        User user = userRepository.findByEmail(parameter.getEmail()).orElseThrow(
+                ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+parameter.getEmail()));
+
+        if(!passwordEncoder.matches(parameter.getPassword(), user.getPassword())){
+            throw new PasswordNotMatchException();
+        }
+        System.out.println("로그인을 하였습니다.");
+        return user;
     }
 }
