@@ -1,18 +1,27 @@
 package com.example.smart_waiting.user.service;
 
-import com.example.smart_waiting.components.MailSenderAdapter;
+import com.example.smart_waiting.components.MailComponents;
 import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.exception.PasswordNotMatchException;
+import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
+import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.model.UserLoginInput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,16 +32,17 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     @Autowired
-    private final MailSenderAdapter mailSenderAdapter;
+    private final MailComponents mailComponents;
+    private final TokenUtil tokenUtil;
 
-
-    //이후에 비동기 처리로 변경 필요해보임!!
     @Transactional
     @Override
     public ServiceResult createUser(UserInput userInput) {
 
         String encryptPassword = passwordEncoder.encode(userInput.getPassword());
         String uuid = UUID.randomUUID().toString();
+        List<String> userRoleList = new ArrayList<>();
+        userRoleList.add("normal");
 
         User user = User.builder()
                 .email(userInput.getEmail())
@@ -41,6 +51,7 @@ public class UserServiceImpl implements UserService{
                 .authKey(uuid)
                 .authDate(LocalDateTime.now().plusDays(3))
                 .userStatus(UserStatus.UNAPPROVED)
+                .userRoles(userRoleList)
                 .build();
 
         userRepository.save(user);
@@ -49,7 +60,7 @@ public class UserServiceImpl implements UserService{
         String subject = "Smart Waiting 사이트 가입을 축하드립니다. ";
         String text = "<p>Smart Waiting 사이트 가입을 축하드립니다.<p><p>아래 링크를 클릭하셔서 가입을 완료 하세요.</p>"
                 + "<div><a target='_blank' href='http://localhost:8080/user/email-auth?id=" + uuid + "'> 가입 완료 </a></div>";
-        mailSenderAdapter.sendMail(email, subject, text);
+        mailComponents.sendMail(email, subject, text);
 
         return ServiceResult.success();
     }
@@ -89,5 +100,32 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
 
         return ServiceResult.success();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        return userRepository.findByEmail(username).orElseThrow(
+                ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+username));
+    }
+
+    @Override
+    public UserDto login(UserLoginInput parameter) {
+        User user = userRepository.findByEmail(parameter.getEmail()).orElseThrow(
+                ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+parameter.getEmail()));
+
+        if(!passwordEncoder.matches(parameter.getPassword(), user.getPassword())){
+            throw new PasswordNotMatchException();
+        }
+        System.out.println("로그인을 하였습니다.");
+        return UserDto.of(user);
+    }
+
+    @Override
+    public UserDto findFromRequest(HttpServletRequest request) {
+        String email = tokenUtil.getEmail(tokenUtil.resolveTokenFromRequest(request));
+        User user = userRepository.findByEmail(email).orElseThrow(
+                ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+email));
+        return UserDto.of(user);
     }
 }
