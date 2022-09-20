@@ -2,6 +2,7 @@ package com.example.smart_waiting.user.service;
 
 import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.user.User;
+import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.model.UserLoginInput;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +19,6 @@ public interface UserService extends UserDetailsService {
 
     ServiceResult emailAuth(String uuid);
 
-    User login(UserLoginInput parameter);
+    UserDto login(UserLoginInput parameter);
 
 }

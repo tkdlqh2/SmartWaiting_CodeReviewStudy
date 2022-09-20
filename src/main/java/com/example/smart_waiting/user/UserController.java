@@ -2,11 +2,13 @@ package com.example.smart_waiting.user;
 
 import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.security.TokenProvider;
+import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.model.UserLoginInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -26,13 +28,13 @@ public class UserController {
         return "user/register";
     }
 
-    @GetMapping("/check_email.do")
+    @GetMapping("/check-email.do")
     public @ResponseBody ResponseEntity<?> existEmail(@RequestParam String email){
         boolean result = userService.existEmail(email);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/check_phone.do")
+    @GetMapping("/check-phone.do")
     public @ResponseBody ResponseEntity<?> existPhone(@RequestParam String phone){
         boolean result = userService.existPhone(phone);
         return ResponseEntity.ok(result);
@@ -66,9 +68,9 @@ public class UserController {
 
     @PostMapping("/login-proc")
     public String loginProc(UserLoginInput parameter){
-        User user = userService.login(parameter);
-        tokenProvider.generateToken(user.getUsername(),user.getUserRoles());
-        return"/";
+        UserDto user = userService.login(parameter);
+        tokenProvider.generateToken(user.getEmail(),user.getUserRoles());
+        return"redirect:/";
     }
 
 }

@@ -6,6 +6,7 @@ import com.example.smart_waiting.exception.PasswordNotMatchException;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
+import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.model.UserLoginInput;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +107,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User login(UserLoginInput parameter) {
+    public UserDto login(UserLoginInput parameter) {
         User user = userRepository.findByEmail(parameter.getEmail()).orElseThrow(
                 ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+parameter.getEmail()));
 
@@ -114,6 +115,6 @@ public class UserServiceImpl implements UserService{
             throw new PasswordNotMatchException();
         }
         System.out.println("로그인을 하였습니다.");
-        return user;
+        return UserDto.of(user);
     }
 }
