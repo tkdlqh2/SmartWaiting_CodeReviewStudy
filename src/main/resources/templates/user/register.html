@@ -15,7 +15,7 @@
                 return false;
             } else{
                 $.ajax({
-                    url : "./check_email.do",
+                    url : "./check-email.do",
                     type : "GET",
                     data : {
                         email : $("#email").val()
@@ -38,7 +38,7 @@
                 $("#phone_check_result").html("패턴에 맞게 입력해주세요.");
             } else{
                 $.ajax({
-                url : "./check_phone.do",
+                url : "./check-phone.do",
                 type : "GET",
                 data : {
                     phone : $("#phone").val()
