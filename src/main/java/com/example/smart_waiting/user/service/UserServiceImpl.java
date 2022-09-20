@@ -3,6 +3,7 @@ package com.example.smart_waiting.user.service;
 import com.example.smart_waiting.components.MailComponents;
 import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.exception.PasswordNotMatchException;
+import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
@@ -17,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,7 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     @Autowired
     private final MailComponents mailComponents;
+    private final TokenUtil tokenUtil;
 
     @Transactional
     @Override
@@ -115,6 +118,14 @@ public class UserServiceImpl implements UserService{
             throw new PasswordNotMatchException();
         }
         System.out.println("로그인을 하였습니다.");
+        return UserDto.of(user);
+    }
+
+    @Override
+    public UserDto findFromRequest(HttpServletRequest request) {
+        String email = tokenUtil.getEmail(tokenUtil.resolveTokenFromRequest(request));
+        User user = userRepository.findByEmail(email).orElseThrow(
+                ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+email));
         return UserDto.of(user);
     }
 }
