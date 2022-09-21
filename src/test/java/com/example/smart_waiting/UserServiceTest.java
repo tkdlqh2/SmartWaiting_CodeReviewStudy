@@ -2,6 +2,7 @@ package com.example.smart_waiting;
 
 import com.example.smart_waiting.components.MailComponents;
 import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.exception.PasswordNotMatchException;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
@@ -200,5 +201,27 @@ public class UserServiceTest {
         //then
         assertEquals("yhj7124@naver.com",userDto.getEmail());
         assertEquals("010-1111-2222",userDto.getPhone());
+    }
+
+    @Test
+    void loginFail_passwordNotMatch(){
+        //given
+        UserLoginInput userLoginInput = UserLoginInput.builder()
+                .email("yhj7124@naver.com")
+                .password("1111")
+                .build();
+
+        given(userRepository.findByEmail(userLoginInput.getEmail()))
+                .willReturn(Optional.of(User.builder()
+                        .email(userLoginInput.getEmail())
+                        .phone("010-1111-2222")
+                        .password(userLoginInput.getPassword())
+                        .build()));
+
+        given(passwordEncoder.matches(userLoginInput.getPassword(),userLoginInput.getPassword()))
+                .willReturn(false);
+        //when
+        //then
+        assertThrows(PasswordNotMatchException.class,()->userService.login(userLoginInput));
     }
 }
