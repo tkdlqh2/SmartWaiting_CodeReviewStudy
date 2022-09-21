@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/login-proc")
-    public String loginProc(Model model, UserLoginInput parameter){
+    public String loginProc(Model model, HttpServletResponse response, UserLoginInput parameter){
         UserDto user;
         try {
             user = userService.login(parameter);
@@ -40,7 +41,8 @@ public class AuthController {
             return "user/loginForm";
         }
 
-        tokenProvider.generateToken(user.getEmail(),user.getUserRoles());
+        String jwtToken = tokenProvider.generateToken(user.getEmail(),user.getUserRoles());
+        response.addHeader("Authorization","Bearer "+jwtToken);
         return"redirect:/";
     }
 }
