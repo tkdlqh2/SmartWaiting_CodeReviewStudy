@@ -41,7 +41,7 @@ public class AuthController {
             return "user/loginForm";
         }
 
-        String jwtToken = tokenProvider.generateToken(user.getEmail(),user.getUserRoles());
+        var jwtToken = tokenProvider.generateToken(user.getEmail(),user.getUserRoles());
         response.addHeader("Authorization","Bearer "+jwtToken);
         return"redirect:/";
     }
