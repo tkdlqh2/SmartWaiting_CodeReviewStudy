@@ -25,4 +25,5 @@ public interface UserService extends UserDetailsService {
 
     UserDto findFromRequest(HttpServletRequest request);
 
+    ServiceResult updateInfo(UserInput parameter);
 }
