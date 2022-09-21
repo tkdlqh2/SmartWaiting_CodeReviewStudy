@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService{
         userRoleList.add("normal");
 
         User user = User.builder()
+                .name(userInput.getName())
                 .email(userInput.getEmail())
                 .password(encryptPassword)
                 .phone(userInput.getPhone())

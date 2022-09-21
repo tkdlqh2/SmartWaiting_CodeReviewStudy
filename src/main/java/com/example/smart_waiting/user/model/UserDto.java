@@ -15,6 +15,7 @@ public class UserDto {
 
     private String email;
     private String phone;
+    private String name;
 
     private UserStatus userStatus;
 
@@ -23,6 +24,7 @@ public class UserDto {
 
     public static UserDto of(User user){
         return UserDto.builder()
+                .name(user.getName())
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .userStatus(user.getUserStatus())

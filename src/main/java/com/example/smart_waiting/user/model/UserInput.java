@@ -10,6 +10,7 @@ import lombok.*;
 public class UserInput {
 
     private String email;
+    private String name;
     private String password;
     private String phone;
 }
