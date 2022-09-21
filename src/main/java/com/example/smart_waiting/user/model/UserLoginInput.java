@@ -1,10 +1,8 @@
 package com.example.smart_waiting.user.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor

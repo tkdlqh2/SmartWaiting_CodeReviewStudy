@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService{
         if(!passwordEncoder.matches(parameter.getPassword(), user.getPassword())){
             throw new PasswordNotMatchException();
         }
-        System.out.println("로그인을 하였습니다.");
+
         return UserDto.of(user);
     }
 }
