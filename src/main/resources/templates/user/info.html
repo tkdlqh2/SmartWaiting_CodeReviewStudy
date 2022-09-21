@@ -6,16 +6,42 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script>
         $(function() {
-
             $('#updateForm').on('submit', function() {
-
                 if (!confirm('회원 정보를 수정하시겠습니까? ')) {
                     return false;
                 }
-
             });
 
-        });
+            $("#phone_check").on('click',function(){
+                const reg2 = /^\d{3}-\d{3,4}-\d{4}$/;
+                if(!reg2.test($("#phone").val())){
+                    $("#phone_check_result").html("패턴에 맞게 입력해주세요.");
+                } else{
+                    $.ajax({
+                    url : "./check-phone.do",
+                    type : "GET",
+                    data : {
+                        phone : $("#phone").val()
+                    },
+                    success : function(result) {
+                            if (result == true) {
+                                $("#phone_check_result").html("중복된 전화번호가 있습니다.");
+                            } else {
+                                $("#phone_check_result").html("사용가능합니다.");
+                            }
+                        }
+                    });
+                }
+            });
+
+            $("#updateForm").submit(function(){
+                if($("#phone_check_result").html() != "사용가능합니다."){
+                    alert("유효한 핸드폰 번호를 입력해주세요.");
+                    return false;
+                }
+            });
+
+    });
     </script>
 </head>
 <body>
@@ -24,13 +50,11 @@
 <h1>회원 정보</h1>
 
 <div>
-    <a href="/member/info">회원 정보 수정</a>
+    <a href="/user/info">회원 정보 수정</a>
     |
-    <a href="/member/password">비밀번호 변경</a>
+    <a href="/user/password">비밀번호 변경</a>
     <hr/>
 </div>
-
-
 
 <div>
     <form id="updateForm" method="post">
@@ -39,19 +63,21 @@
             <tr>
                 <th>아이디(이메일)</th>
                 <td>
-                    <p th:text="${detail.userId}">아이디</p>
+                    <p th:text="${detail.email}">이메일</p>
                 </td>
             </tr>
             <tr>
                 <th>이름</th>
                 <td>
-                    <p th:text="${detail.userName}">이름</p>
+                    <p th:text="${detail.name}">이름</p>
                 </td>
             </tr>
             <tr>
                 <th>전화번호</th>
                 <td>
-                    <input name="phone" type="text" th:value="${detail.phone}"/>
+                    <input name="phone" id="phone" type="tel" th:value="${detail.phone}"/>
+                    <input type="button" id="phone_check" value="중복 검사"/>
+                    <span id="phone_check_result"></span>
                 </td>
             </tr>
             </tbody>
@@ -59,7 +85,7 @@
 
         <div>
             <button type="submit">수정</button>
-            <a href="/member/withdraw"> 회원 탈퇴 </a>
+            <a href="/user/withdraw"> 회원 탈퇴 </a>
         </div>
     </form>
 </div>
