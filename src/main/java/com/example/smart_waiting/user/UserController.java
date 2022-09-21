@@ -1,10 +1,13 @@
 package com.example.smart_waiting.user;
 
 import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.security.TokenUtil;
+import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +53,21 @@ public class UserController {
         model.addAttribute("errorMessage",result.getMessage());
 
         return "user/email_auth";
+    }
+
+    @GetMapping("/info")
+    public String info(Model model, HttpServletRequest request){
+        UserDto detail = userService.findFromRequest(request);
+
+        model.addAttribute("detail",detail);
+        return "user/info";
+    }
+
+    @PatchMapping("/info")
+    public String infoEdit(Model model, UserInput parameter){
+        ServiceResult result = userService.updateInfo(parameter);
+
+        return "redirect:/user/info";
     }
 
 }
