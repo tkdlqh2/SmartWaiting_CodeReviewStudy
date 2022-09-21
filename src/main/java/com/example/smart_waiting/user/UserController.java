@@ -63,4 +63,11 @@ public class UserController {
         return "user/info";
     }
 
+    @PatchMapping("/info")
+    public String infoEdit(Model model, UserInput parameter){
+        ServiceResult result = userService.updateInfo(parameter);
+
+        return "redirect:/user/info";
+    }
+
 }

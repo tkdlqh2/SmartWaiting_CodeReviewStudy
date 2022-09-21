@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -128,5 +129,18 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+email));
         return UserDto.of(user);
+    }
+
+    @Override
+    public ServiceResult updateInfo(UserInput parameter) {
+        Optional<User> optionalUser = userRepository.findByEmail(parameter.getEmail());
+        if(optionalUser.isEmpty()){
+            return ServiceResult.fail("회원 정보가 존재하지 않습니다.");
+        }
+        User user = optionalUser.get();
+        user.setPhone(parameter.getPhone());
+        userRepository.save(user);
+
+        return ServiceResult.success();
     }
 }
