@@ -5,6 +5,7 @@ import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.model.UserLoginInput;
+import com.example.smart_waiting.user.model.UserPasswordResetInput;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,7 @@ public interface UserService extends UserDetailsService {
 
     UserDto findFromRequest(HttpServletRequest request);
 
-    ServiceResult updateInfo(UserInput parameter);
+    ServiceResult updateInfo(String email,UserInput parameter);
+
+    ServiceResult updatePassword(String email, UserPasswordResetInput parameter);
 }
