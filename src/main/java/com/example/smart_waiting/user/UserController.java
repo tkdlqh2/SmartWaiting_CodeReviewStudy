@@ -1,11 +1,14 @@
 package com.example.smart_waiting.user;
 
+import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.model.UserPasswordResetInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -45,30 +48,28 @@ public class UserController {
     @GetMapping("/email-auth")
     public String emailAuth(Model model, HttpServletRequest request){
         String uuid = request.getParameter("id");
-        try{
-            userService.emailAuth(uuid);
-        } catch (Exception e){
-            model.addAttribute("errorMessage",e.getMessage());
-        }
+
+        ServiceResult result = userService.emailAuth(uuid);
+        model.addAttribute("result",result.isSuccess());
+        model.addAttribute("errorMessage",result.getMessage());
+
         return "user/email_auth";
     }
 
     @GetMapping("/info")
     public String info(Model model, HttpServletRequest request){
         UserDto detail = userService.findFromRequest(request);
-        model.addAttribute("detail",detail);
 
+        model.addAttribute("detail",detail);
         return "user/info";
     }
 
     @PatchMapping("/info")
     public String infoEdit(Model model, HttpServletRequest request, UserInput parameter){
         UserDto user = userService.findFromRequest(request);
-        try{
-            userService.updateInfo(user.getEmail(), parameter);
-        } catch (Exception e){
-            model.addAttribute("errorMessage",e.getMessage());
-        }
+        ServiceResult result = userService.updateInfo(user.getEmail(), parameter);
+
+        model.addAttribute("detail",user);
 
         return "redirect:/user/info";
     }
@@ -76,15 +77,13 @@ public class UserController {
     @GetMapping("/password")
     public String password(){ return "user/password"; }
 
-    @PatchMapping("/password.do")
-    public @ResponseBody ResponseEntity<?> passwordEdit(HttpServletRequest request, UserPasswordResetInput parameter){
+    @PatchMapping("/password")
+    public String passwordEdit(Model model, HttpServletRequest request, UserPasswordResetInput parameter){
         UserDto user = userService.findFromRequest(request);
-        try{
-            userService.updatePassword(user.getEmail(),parameter);
-        } catch (Exception e){
-            return ResponseEntity.ok(false);
-        }
-        return ResponseEntity.ok(true);
+        ServiceResult result = userService.updatePassword(user.getEmail(),parameter);
+        model.addAttribute("result",result.isSuccess());
+
+        return "redirect:/user/password";
     }
 
 }
