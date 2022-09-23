@@ -77,13 +77,12 @@ public class UserController {
     @GetMapping("/password")
     public String password(){ return "user/password"; }
 
-    @PatchMapping("/password")
-    public String passwordEdit(Model model, HttpServletRequest request, UserPasswordResetInput parameter){
+    @PatchMapping("/password.do")
+    public @ResponseBody ResponseEntity<?> passwordEdit(Model model, HttpServletRequest request, UserPasswordResetInput parameter){
         UserDto user = userService.findFromRequest(request);
         ServiceResult result = userService.updatePassword(user.getEmail(),parameter);
-        model.addAttribute("result",result.isSuccess());
 
-        return "redirect:/user/password";
+        return ResponseEntity.ok(result);
     }
 
 }
