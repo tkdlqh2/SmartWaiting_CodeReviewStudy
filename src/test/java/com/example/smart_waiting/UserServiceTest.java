@@ -8,6 +8,7 @@ import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.model.UserPasswordResetInput;
 import com.example.smart_waiting.user.service.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -117,9 +118,12 @@ public class UserServiceTest {
         //when
         ServiceResult result = userService.emailAuth("인증키~");
 
+
         //then
         assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
+        User UserCaptorValue = captor.getValue();
+        assertEquals(UserStatus.APPROVED,UserCaptorValue.getUserStatus());
     }
 
     @Test
@@ -214,6 +218,8 @@ public class UserServiceTest {
         //then
         assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
+        User UserCaptorValue = captor.getValue();
+        assertEquals("010-2222-3333",UserCaptorValue.getPhone());
     }
 
     @Test
@@ -234,8 +240,82 @@ public class UserServiceTest {
     @Test
     void updatePasswordSuccess(){
         //given
+        UserPasswordResetInput userPasswordResetInput =
+                new UserPasswordResetInput("1111","2222");
+
+        User user = User.builder()
+                .name("유형진")
+                .email("yhj7124@naver.com")
+                .password("1111")
+                .phone("010-1111-2222")
+                .build();
+
+        given(userRepository.findByEmail("yhj7124@naver.com"))
+                .willReturn(Optional.of(user));
+
+        given(passwordEncoder.matches(userPasswordResetInput.getPassword()
+                ,user.getPassword())).willReturn(true);
+
+        given(passwordEncoder.encode(userPasswordResetInput.getNewPassword())).willReturn("3333");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
         //when
+        ServiceResult result = userService.updatePassword("yhj7124@naver.com",userPasswordResetInput);
+
         //then
+        assertTrue(result.isSuccess());
+        verify(userRepository,times(1)).save(captor.capture());
+        User UserCaptorValue = captor.getValue();
+        assertEquals("3333",UserCaptorValue.getPassword());
+    }
+
+    @Test
+    void updatePasswordFail_NoUser(){
+        //given
+        UserPasswordResetInput userPasswordResetInput =
+                new UserPasswordResetInput("1111","2222");
+
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        //when
+        ServiceResult result = userService.updatePassword("yhj7124@naver.com",userPasswordResetInput);
+
+        //then
+        assertFalse(result.isSuccess());
+        assertEquals("회원 정보가 존재하지 않습니다.",result.getMessage());
+        verify(userRepository,times(0)).save(captor.capture());
+    }
+
+    @Test
+    void updatePasswordFail_CurPasswordUnMatch(){
+        //given
+        UserPasswordResetInput userPasswordResetInput =
+                new UserPasswordResetInput("1111","2222");
+
+        User user = User.builder()
+                .name("유형진")
+                .email("yhj7124@naver.com")
+                .password("1111")
+                .phone("010-1111-2222")
+                .build();
+
+        given(userRepository.findByEmail("yhj7124@naver.com"))
+                .willReturn(Optional.of(user));
+
+        given(passwordEncoder.matches(userPasswordResetInput.getPassword()
+                ,user.getPassword())).willReturn(false);
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        //when
+        ServiceResult result = userService.updatePassword("yhj7124@naver.com",userPasswordResetInput);
+
+        //then
+        assertFalse(result.isSuccess());
+        assertEquals("현재 비밀번호가 일치하지 않습니다.",result.getMessage());
+        verify(userRepository,times(0)).save(captor.capture());
     }
 
 
