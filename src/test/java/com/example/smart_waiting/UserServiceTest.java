@@ -214,7 +214,21 @@ public class UserServiceTest {
         //then
         assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
+    }
 
+    @Test
+    void updateInfoFail_NoUser(){
+        //given
+        UserInput userInput = new UserInput();
+        userInput.setPhone("010-2222-3333");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        //when
+        ServiceResult result = userService.updateInfo("yhj7124@naver.com",userInput);
+
+        //then
+        assertFalse(result.isSuccess());
+        verify(userRepository,times(0)).save(captor.capture());
     }
 
     @Test
