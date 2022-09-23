@@ -4,6 +4,7 @@ import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.model.UserPasswordResetInput;
 import com.example.smart_waiting.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -64,10 +65,25 @@ public class UserController {
     }
 
     @PatchMapping("/info")
-    public String infoEdit(Model model, UserInput parameter){
-        ServiceResult result = userService.updateInfo(parameter);
+    public String infoEdit(Model model, HttpServletRequest request, UserInput parameter){
+        UserDto user = userService.findFromRequest(request);
+        ServiceResult result = userService.updateInfo(user.getEmail(), parameter);
+
+        model.addAttribute("detail",user);
 
         return "redirect:/user/info";
+    }
+
+    @GetMapping("/password")
+    public String password(){ return "user/password"; }
+
+    @PatchMapping("/password")
+    public String passwordEdit(Model model, HttpServletRequest request, UserPasswordResetInput parameter){
+        UserDto user = userService.findFromRequest(request);
+        ServiceResult result = userService.updatePassword(user.getEmail(),parameter);
+        model.addAttribute("result",result.isSuccess());
+
+        return "redirect:/user/password";
     }
 
 }

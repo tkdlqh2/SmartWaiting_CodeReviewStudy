@@ -10,6 +10,7 @@ import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.model.UserLoginInput;
+import com.example.smart_waiting.user.model.UserPasswordResetInput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -132,13 +133,33 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public ServiceResult updateInfo(UserInput parameter) {
-        Optional<User> optionalUser = userRepository.findByEmail(parameter.getEmail());
+    public ServiceResult updateInfo(String email, UserInput parameter) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
         if(optionalUser.isEmpty()){
             return ServiceResult.fail("회원 정보가 존재하지 않습니다.");
         }
         User user = optionalUser.get();
         user.setPhone(parameter.getPhone());
+        userRepository.save(user);
+
+        return ServiceResult.success();
+    }
+
+
+    @Override
+    public ServiceResult updatePassword(String email, UserPasswordResetInput parameter) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(optionalUser.isEmpty()){
+            return ServiceResult.fail("회원 정보가 존재하지 않습니다.");
+        }
+        User user = optionalUser.get();
+
+        if(!passwordEncoder.matches(parameter.getPassword(), user.getPassword())){
+            return ServiceResult.fail("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        String encryptedPassword = passwordEncoder.encode(parameter.getNewPassword());
+        user.setPassword(encryptedPassword);
         userRepository.save(user);
 
         return ServiceResult.success();
