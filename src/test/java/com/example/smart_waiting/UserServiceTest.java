@@ -2,10 +2,13 @@ package com.example.smart_waiting;
 
 import com.example.smart_waiting.components.MailSenderAdapter;
 import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.exception.PasswordNotMatchException;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
+import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.model.UserLoginInput;
 import com.example.smart_waiting.user.service.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +17,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
@@ -139,8 +146,6 @@ public class UserServiceTest {
                         .authDate(LocalDateTime.now().minusDays(1))
                         .build()));
 
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-
         //when
         ServiceResult result = userService.emailAuth("인증키~");
 
@@ -149,4 +154,74 @@ public class UserServiceTest {
         assertEquals("인증키가 만료되었습니다.",result.getMessage());
     }
 
+    @Test
+    void loadUserByUsernameTestSuccess(){
+        //given
+        given(userRepository.findByEmail(anyString()))
+                .willReturn(Optional.of(User.builder()
+                        .id(1L)
+                        .email("yhj7124@naver.com")
+                        .build()));
+        //when
+        UserDetails userDetails = userService.loadUserByUsername("");
+
+        //then
+        assertEquals("yhj7124@naver.com",userDetails.getUsername());
+    }
+
+    @Test
+    void loadUserByUsernameTestFail_NoEmail(){
+        //given
+        //when
+        //then
+        assertThrows(UsernameNotFoundException.class,()->userService.loadUserByUsername(""));
+    }
+
+    @Test
+    void loginSuccess(){
+        //given
+        UserLoginInput userLoginInput = UserLoginInput.builder()
+                .email("yhj7124@naver.com")
+                .password("1111")
+                .build();
+
+        given(userRepository.findByEmail(userLoginInput.getEmail()))
+                .willReturn(Optional.of(User.builder()
+                                .email(userLoginInput.getEmail())
+                                .phone("010-1111-2222")
+                                .password(userLoginInput.getPassword())
+                        .build()));
+
+        given(passwordEncoder.matches(userLoginInput.getPassword(),userLoginInput.getPassword()))
+                .willReturn(true);
+
+        //when
+        UserDto userDto = userService.login(userLoginInput);
+
+        //then
+        assertEquals("yhj7124@naver.com",userDto.getEmail());
+        assertEquals("010-1111-2222",userDto.getPhone());
+    }
+
+    @Test
+    void loginFail_passwordNotMatch(){
+        //given
+        UserLoginInput userLoginInput = UserLoginInput.builder()
+                .email("yhj7124@naver.com")
+                .password("1111")
+                .build();
+
+        given(userRepository.findByEmail(userLoginInput.getEmail()))
+                .willReturn(Optional.of(User.builder()
+                        .email(userLoginInput.getEmail())
+                        .phone("010-1111-2222")
+                        .password(userLoginInput.getPassword())
+                        .build()));
+
+        given(passwordEncoder.matches(userLoginInput.getPassword(),userLoginInput.getPassword()))
+                .willReturn(false);
+        //when
+        //then
+        assertThrows(PasswordNotMatchException.class,()->userService.login(userLoginInput));
+    }
 }

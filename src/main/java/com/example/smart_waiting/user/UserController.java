@@ -23,13 +23,13 @@ public class UserController {
         return "user/register";
     }
 
-    @GetMapping("/check_email.do")
+    @GetMapping("/check-email.do")
     public @ResponseBody ResponseEntity<?> existEmail(@RequestParam String email){
         boolean result = userService.existEmail(email);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/check_phone.do")
+    @GetMapping("/check-phone.do")
     public @ResponseBody ResponseEntity<?> existPhone(@RequestParam String phone){
         boolean result = userService.existPhone(phone);
         return ResponseEntity.ok(result);

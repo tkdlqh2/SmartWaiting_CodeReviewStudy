@@ -2,11 +2,14 @@ package com.example.smart_waiting.user.service;
 
 import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.user.User;
+import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.model.UserLoginInput;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
-public interface UserService {
+public interface UserService extends UserDetailsService {
 
     ServiceResult createUser(UserInput userInput);
 
@@ -15,5 +18,7 @@ public interface UserService {
     boolean existPhone(String phone);
 
     ServiceResult emailAuth(String uuid);
+
+    UserDto login(UserLoginInput parameter);
 
 }
