@@ -1,5 +1,6 @@
 package com.example.smart_waiting.market;
 
+import com.example.smart_waiting.domain.ListFoodConverter;
 import com.example.smart_waiting.domain.ListStringConverter;
 import com.example.smart_waiting.type.MarketStatus;
 import com.example.smart_waiting.type.MarketType;
@@ -41,10 +42,12 @@ public class Market {
     private List<String> openWeekDay;
     private Integer maximumRegNum;
     private String imagePath;
+    @Enumerated(EnumType.STRING)
     private MarketStatus marketStatus;
     private boolean isOpen;
 
     @OneToMany(fetch = FetchType.EAGER)
+    @Convert(converter = ListFoodConverter.class)
     private List<Food> menu = new ArrayList<>();
 
 }
