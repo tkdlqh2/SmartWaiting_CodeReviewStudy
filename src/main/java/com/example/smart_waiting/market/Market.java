@@ -1,5 +1,6 @@
 package com.example.smart_waiting.market;
 
+import com.example.smart_waiting.domain.ListStringConverter;
 import com.example.smart_waiting.type.MarketStatus;
 import com.example.smart_waiting.type.MarketType;
 import com.example.smart_waiting.user.User;
@@ -36,6 +37,7 @@ public class Market {
 
     private Long openHour;
     private Long closeHour;
+    @Convert(converter = ListStringConverter.class)
     private List<String> openWeekDay;
     private Integer maximumRegNum;
     private String imagePath;
