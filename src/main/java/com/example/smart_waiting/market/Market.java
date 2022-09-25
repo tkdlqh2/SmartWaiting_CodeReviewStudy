@@ -28,8 +28,6 @@ public class Market {
     private User owner;
 
     private String name;
-    private String location;
-    private String type;
     private String registrationNum;
     private Long zipCode;
     private String detailAddress;
