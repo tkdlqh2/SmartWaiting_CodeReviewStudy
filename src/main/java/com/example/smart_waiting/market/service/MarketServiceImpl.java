@@ -4,7 +4,9 @@ import com.example.smart_waiting.domain.ServiceResult;
 import com.example.smart_waiting.market.FoodRepository;
 import com.example.smart_waiting.market.Market;
 import com.example.smart_waiting.market.MarketRepository;
+import com.example.smart_waiting.market.model.MarketDto;
 import com.example.smart_waiting.market.model.MarketRegInput;
+import com.example.smart_waiting.type.MarketStatus;
 import com.example.smart_waiting.type.MarketType;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
@@ -27,7 +29,7 @@ public class MarketServiceImpl implements MarketService{
     public ServiceResult regMarket(UserDto userDto, MarketRegInput parameter) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if(optionalUser.isEmpty()){
-            return ServiceResult.fail("유저가 존재하지 않습니다. Email -> "+userDto.getEmail());
+            return ServiceResult.fail("유저가 존재하지 않습니다. -> "+userDto.getEmail());
         }
 
 
@@ -37,10 +39,22 @@ public class MarketServiceImpl implements MarketService{
                 .registrationNum(parameter.getRegistrationNum())
                 .zipCode(parameter.getZipCode())
                 .marketType(MarketType.of(parameter.getMarketType()))
+                .marketStatus(MarketStatus.UNAPPROVED)
                 .build();
 
         marketRepository.save(market);
 
         return ServiceResult.success();
+    }
+
+    @Override
+    public MarketDto getInfo(UserDto userDto) {
+        User user = userRepository.findByEmail(userDto.getEmail())
+                .orElseThrow(()->new UsernameNotFoundException("유저가 존재하지 않습니다. ->"+userDto.getEmail()));
+
+        Market market = marketRepository.findByUser(user)
+                .orElseThrow(()->new MarketNotFoundException());
+
+        return MarketDto.of(market);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.smart_waiting.market;
 
 import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.market.model.MarketDto;
 import com.example.smart_waiting.market.model.MarketRegInput;
 import com.example.smart_waiting.market.service.MarketService;
 import com.example.smart_waiting.user.model.UserDto;
@@ -33,5 +34,13 @@ public class MarketController {
         ServiceResult result = marketService.regMarket(userDto, parameter);
         model.addAttribute("result",result);
         return "redirect:/market/reg";
+    }
+
+    @GetMapping("/info")
+    public String getInfo(Model model, HttpServletRequest request){
+        UserDto userDto = userService.findFromRequest(request);
+        MarketDto marketDto = marketService.getInfo(userDto);
+        model.addAttribute("info",marketDto);
+        return "market/info";
     }
 }
