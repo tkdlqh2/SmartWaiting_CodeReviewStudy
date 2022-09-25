@@ -1,10 +1,12 @@
 package com.example.smart_waiting.market.service;
 
 import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.exception.MarketNotFoundException;
 import com.example.smart_waiting.market.FoodRepository;
 import com.example.smart_waiting.market.Market;
 import com.example.smart_waiting.market.MarketRepository;
 import com.example.smart_waiting.market.model.MarketDto;
+import com.example.smart_waiting.market.model.MarketInfoInput;
 import com.example.smart_waiting.market.model.MarketRegInput;
 import com.example.smart_waiting.type.MarketStatus;
 import com.example.smart_waiting.type.MarketType;
@@ -53,8 +55,27 @@ public class MarketServiceImpl implements MarketService{
                 .orElseThrow(()->new UsernameNotFoundException("유저가 존재하지 않습니다. ->"+userDto.getEmail()));
 
         Market market = marketRepository.findByUser(user)
-                .orElseThrow(()->new MarketNotFoundException());
+                .orElseThrow(MarketNotFoundException::new);
 
         return MarketDto.of(market);
+    }
+
+    @Override
+    public ServiceResult editInfo(UserDto userDto, MarketInfoInput parameter) {
+        Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
+        if(optionalUser.isEmpty()){return ServiceResult.fail("유저가 존재하지 않습니다. ->"+userDto.getEmail());}
+
+        Optional<Market> optionalMarket = marketRepository.findByUser(optionalUser.get());
+        if(optionalMarket.isEmpty()){return ServiceResult.fail("음식점을 등록하지 않은 유저입니다.");}
+
+        Market market = optionalMarket.get();
+        market.setOpenHour(parameter.getOpenHour());
+        market.setCloseHour(parameter.getCloseHour());
+        market.setOpenWeekDay(parameter.getOpenWeekDay());
+        market.setMaximumRegNum(parameter.getMaximumRegNum());
+        market.setImagePath(parameter.getImagePath());
+        market.setOpen(parameter.isOpen());
+
+        return ServiceResult.success();
     }
 }

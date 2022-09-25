@@ -21,7 +21,7 @@ public class FileUtils {
     @Value("${file.url_path}")
     private static String BASE_URL_PATH;
 
-    public static void SetFileNames(MultipartFile file, InputWithFile input){
+    public static void SetInputFileNames(MultipartFile file, InputWithFile input){
 
         String saveFilename = "";
         String urlFilename = "";
