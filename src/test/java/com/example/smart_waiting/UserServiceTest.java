@@ -1,13 +1,14 @@
 package com.example.smart_waiting;
 
 import com.example.smart_waiting.components.MailComponents;
-import com.example.smart_waiting.domain.ServiceResult;
+import com.example.smart_waiting.exception.UserException;
 import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.type.UserStatus;
 import com.example.smart_waiting.user.User;
 import com.example.smart_waiting.user.UserRepository;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
+import com.example.smart_waiting.user.model.UserPasswordResetInput;
 import com.example.smart_waiting.user.service.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,6 @@ public class UserServiceTest {
     @Mock
     private MailComponents mailComponents;
 
-    @Mock
-    private TokenUtil tokenUtil;
-
     @InjectMocks
     private UserServiceImpl userService;
 
@@ -59,10 +57,9 @@ public class UserServiceTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
         //when
-        ServiceResult result = userService.createUser(userInput);
+        userService.createUser(userInput);
 
         //then
-        assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
     }
 
@@ -115,11 +112,13 @@ public class UserServiceTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
         //when
-        ServiceResult result = userService.emailAuth("인증키~");
+        userService.emailAuth("인증키~");
+
 
         //then
-        assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
+        User UserCaptorValue = captor.getValue();
+        assertEquals(UserStatus.APPROVED,UserCaptorValue.getUserStatus());
     }
 
     @Test
@@ -127,11 +126,8 @@ public class UserServiceTest {
     void emailAuthFailure_noneKey(){
         //given
         //when
-        ServiceResult result = userService.emailAuth("인증키~");
-
         //then
-        assertFalse(result.isSuccess());
-        assertEquals("인증키가 유효하지 않습니다.",result.getMessage());
+        assertThrows(UserException.class,()->userService.emailAuth("인증키~"));
     }
 
     @Test
@@ -148,11 +144,8 @@ public class UserServiceTest {
 
 
         //when
-        ServiceResult result = userService.emailAuth("인증키~");
-
         //then
-        assertFalse(result.isSuccess());
-        assertEquals("인증키가 만료되었습니다.",result.getMessage());
+        assertThrows(UserException.class,()->userService.emailAuth("인증키~"));
     }
 
     @Test
@@ -160,7 +153,7 @@ public class UserServiceTest {
         //given
 
         HttpServletRequest request = mock(HttpServletRequest.class);
-        given(tokenUtil.getEmail(any())).willReturn("yhj7124@naver.com");
+        given(TokenUtil.getEmail(any())).willReturn("yhj7124@naver.com");
 
         User user = User.builder()
                 .id(1L)
@@ -183,7 +176,7 @@ public class UserServiceTest {
     void findFromRequestFail_NoUser(){
         //given
         HttpServletRequest request = mock(HttpServletRequest.class);
-        given(tokenUtil.getEmail(any())).willReturn("yhj7124@naver.com");
+        given(TokenUtil.getEmail(any())).willReturn("yhj7124@naver.com");
 
         //when
         //then
@@ -209,19 +202,102 @@ public class UserServiceTest {
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         //when
-        ServiceResult result = userService.updateInfo("yhj7124@naver.com",userInput);
+        userService.updateInfo("yhj7124@naver.com",userInput);
 
         //then
-        assertTrue(result.isSuccess());
         verify(userRepository,times(1)).save(captor.capture());
+        User UserCaptorValue = captor.getValue();
+        assertEquals("010-2222-3333",UserCaptorValue.getPhone());
+    }
 
+    @Test
+    void updateInfoFail_NoUser(){
+        //given
+        UserInput userInput = new UserInput();
+        userInput.setPhone("010-2222-3333");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        //when
+        userService.updateInfo("yhj7124@naver.com",userInput);
+
+        //then
+        verify(userRepository,times(0)).save(captor.capture());
     }
 
     @Test
     void updatePasswordSuccess(){
         //given
+        UserPasswordResetInput userPasswordResetInput =
+                new UserPasswordResetInput("1111","2222");
+
+        User user = User.builder()
+                .name("유형진")
+                .email("yhj7124@naver.com")
+                .password("1111")
+                .phone("010-1111-2222")
+                .build();
+
+        given(userRepository.findByEmail("yhj7124@naver.com"))
+                .willReturn(Optional.of(user));
+
+        given(passwordEncoder.matches(userPasswordResetInput.getPassword()
+                ,user.getPassword())).willReturn(true);
+
+        given(passwordEncoder.encode(userPasswordResetInput.getNewPassword())).willReturn("3333");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        //when
+        userService.updatePassword("yhj7124@naver.com",userPasswordResetInput);
+
+        //then
+        verify(userRepository,times(1)).save(captor.capture());
+        User UserCaptorValue = captor.getValue();
+        assertEquals("3333",UserCaptorValue.getPassword());
+    }
+
+    @Test
+    void updatePasswordFail_NoUser(){
+        //given
+        UserPasswordResetInput userPasswordResetInput =
+                new UserPasswordResetInput("1111","2222");
+
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
         //when
         //then
+        assertThrows(UsernameNotFoundException.class,
+                ()->userService.updatePassword("yhj7124@naver.com",userPasswordResetInput));
+        verify(userRepository,times(0)).save(captor.capture());
+    }
+
+    @Test
+    void updatePasswordFail_CurPasswordUnMatch(){
+        //given
+        UserPasswordResetInput userPasswordResetInput =
+                new UserPasswordResetInput("1111","2222");
+
+        User user = User.builder()
+                .name("유형진")
+                .email("yhj7124@naver.com")
+                .password("1111")
+                .phone("010-1111-2222")
+                .build();
+
+        given(userRepository.findByEmail("yhj7124@naver.com"))
+                .willReturn(Optional.of(user));
+
+        given(passwordEncoder.matches(userPasswordResetInput.getPassword()
+                ,user.getPassword())).willReturn(false);
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        //when
+        //then
+        assertThrows(UsernameNotFoundException.class,
+                ()->userService.updatePassword("yhj7124@naver.com",userPasswordResetInput));
+        verify(userRepository,times(0)).save(captor.capture());
     }
 
 
