@@ -10,4 +10,14 @@ public enum MarketType {
     DESSERT("디저트"), CAFE("카페"), PUB("술집"),BRUNCH("브런치");
 
     public final String details;
+
+    public static MarketType of(String string){
+        for (MarketType marketType:MarketType.values()){
+            if(string.equals(marketType.getDetails())){
+                return marketType;
+            }
+        }
+
+        return null;
+    }
 }
