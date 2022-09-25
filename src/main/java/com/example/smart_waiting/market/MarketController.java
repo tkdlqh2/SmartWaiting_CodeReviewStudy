@@ -19,12 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
+// user를 가져오는 것을 request에서 market을 가져오는 것으로 refactoring 필요
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/market")
 public class MarketController {
 
-    private final UserService userService;
     private final MarketService marketService;
 
     @GetMapping("/reg-form")
@@ -34,16 +34,15 @@ public class MarketController {
 
     @PostMapping("/reg")
     public String reg(Model model, HttpServletRequest request, MarketRegInput parameter){
-        UserDto userDto = userService.findFromRequest(request);
-        ServiceResult result = marketService.regMarket(userDto, parameter);
+        MarketDto marketDto = marketService.findFromRequest(request);
+        ServiceResult result = marketService.regMarket(marketDto, parameter);
         model.addAttribute("result",result);
         return "redirect:/market/reg";
     }
 
     @GetMapping("/info")
     public String getInfo(Model model, HttpServletRequest request){
-        UserDto userDto = userService.findFromRequest(request);
-        MarketDto marketDto = marketService.getInfo(userDto);
+        MarketDto marketDto = marketService.findFromRequest(request);
         model.addAttribute("info",marketDto);
         return "market/info";
     }
@@ -52,11 +51,22 @@ public class MarketController {
     public String editInfo(Model model, HttpServletRequest request,
                            MultipartFile file, MarketInfoInput parameter){
 
-        UserDto userDto = userService.findFromRequest(request);
+        MarketDto marketDto = marketService.findFromRequest(request);
         FileUtils.SetInputFileNames(file,parameter);
-        ServiceResult result = marketService.editInfo(userDto,parameter);
+        ServiceResult result = marketService.editInfo(marketDto,parameter);
         model.addAttribute("result",result);
 
         return "redirect:/market/info";
     }
+
+//    @PostMapping
+//    public String addFood(Model model, HttpServletRequest request,
+//                          MultipartFile file, FoodInfoInput parameter){
+//
+//        UserDto userDto = userService.findFromRequest(request);
+//
+//
+//
+//    }
+
 }

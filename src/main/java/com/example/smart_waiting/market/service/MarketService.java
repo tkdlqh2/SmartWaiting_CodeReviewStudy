@@ -7,12 +7,14 @@ import com.example.smart_waiting.market.model.MarketRegInput;
 import com.example.smart_waiting.user.model.UserDto;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Service
 public interface MarketService {
 
-    ServiceResult regMarket(UserDto userDto, MarketRegInput parameter);
+    ServiceResult regMarket(MarketDto marketDto, MarketRegInput parameter);
 
-    MarketDto getInfo(UserDto userDto);
+    ServiceResult editInfo(MarketDto marketDto, MarketInfoInput parameter);
 
-    ServiceResult editInfo(UserDto userDto, MarketInfoInput parameter);
+    MarketDto findFromRequest(HttpServletRequest request);
 }

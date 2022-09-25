@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @Service
@@ -28,7 +29,7 @@ public class MarketServiceImpl implements MarketService{
     private final UserRepository userRepository;
 
     @Override
-    public ServiceResult regMarket(UserDto userDto, MarketRegInput parameter) {
+    public ServiceResult regMarket(MarketDto marketDto, MarketRegInput parameter) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if(optionalUser.isEmpty()){
             return ServiceResult.fail("유저가 존재하지 않습니다. -> "+userDto.getEmail());
@@ -50,18 +51,7 @@ public class MarketServiceImpl implements MarketService{
     }
 
     @Override
-    public MarketDto getInfo(UserDto userDto) {
-        User user = userRepository.findByEmail(userDto.getEmail())
-                .orElseThrow(()->new UsernameNotFoundException("유저가 존재하지 않습니다. ->"+userDto.getEmail()));
-
-        Market market = marketRepository.findByUser(user)
-                .orElseThrow(MarketNotFoundException::new);
-
-        return MarketDto.of(market);
-    }
-
-    @Override
-    public ServiceResult editInfo(UserDto userDto, MarketInfoInput parameter) {
+    public ServiceResult editInfo(MarketDto marketDto, MarketInfoInput parameter) {
         Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
         if(optionalUser.isEmpty()){return ServiceResult.fail("유저가 존재하지 않습니다. ->"+userDto.getEmail());}
 
@@ -77,5 +67,11 @@ public class MarketServiceImpl implements MarketService{
         market.setOpen(parameter.isOpen());
 
         return ServiceResult.success();
+    }
+
+
+    public MarketDto findFromRequest(HttpServletRequest request) {
+
+        return null;
     }
 }
