@@ -2,10 +2,15 @@ package com.example.smart_waiting.user;
 
 import com.example.smart_waiting.type.UserStatus;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Builder
 @Getter
@@ -13,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +29,7 @@ public class User {
     @Column(name = "email", nullable = false,unique = true)
     private String email;
 
+    private String name;
     private String password;
 
     @Column(name = "phone", nullable = false,unique = true)
@@ -36,7 +42,43 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-    private boolean isAdmin;
+    @Column
+    @ElementCollection(targetClass = String.class)
+    private List<String> userRoles;
     private boolean isReserving;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> collection = new ArrayList<>();
+        for (String e : userRoles) {
+            collection.add(() -> e);
+        }
+
+        return collection;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
