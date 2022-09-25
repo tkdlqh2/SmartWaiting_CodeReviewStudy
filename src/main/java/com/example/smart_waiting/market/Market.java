@@ -33,6 +33,8 @@ public class Market {
     private String detailAddress;
     @Enumerated(EnumType.STRING)
     private MarketType marketType;
+    @Enumerated(EnumType.STRING)
+    private MarketStatus marketStatus;
 
     private Long openHour;
     private Long closeHour;
@@ -40,8 +42,6 @@ public class Market {
     private List<String> openWeekDay;
     private Integer maximumRegNum;
     private String imagePath;
-    @Enumerated(EnumType.STRING)
-    private MarketStatus marketStatus;
     private boolean isOpen;
 
     @OneToMany(fetch = FetchType.EAGER)
