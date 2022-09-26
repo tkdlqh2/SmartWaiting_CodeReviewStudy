@@ -1,6 +1,6 @@
 package com.example.smart_waiting.user.service;
 
-import com.example.smart_waiting.components.MailComponents;
+import com.example.smart_waiting.components.MailSenderAdapter;
 import com.example.smart_waiting.exception.UserException;
 import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.type.ErrorCode;
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     @Autowired
-    private final MailComponents mailComponents;
+    private final MailSenderAdapter mailComponents;
 
     @Transactional
     @Override
