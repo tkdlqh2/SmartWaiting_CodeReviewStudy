@@ -1,6 +1,5 @@
 package com.example.smart_waiting.security;
 
-import com.example.smart_waiting.exception.PasswordNotMatchException;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserLoginInput;
 import com.example.smart_waiting.user.service.UserService;
@@ -33,10 +32,7 @@ public class AuthController {
         UserDto user;
         try {
             user = userService.login(parameter);
-        } catch (PasswordNotMatchException e){
-            model.addAttribute("error",e.getMessage());
-            return "user/loginForm";
-        } catch (UsernameNotFoundException e){
+        } catch (Exception e){
             model.addAttribute("error",e.getMessage());
             return "user/loginForm";
         }
