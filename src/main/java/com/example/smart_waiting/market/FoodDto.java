@@ -15,8 +15,9 @@ public class FoodDto {
     private String price;
     private String imagePath;
 
-    public FoodDto of(Food food){
+    public static FoodDto of(Food food){
         return FoodDto.builder()
+                .market(food.getMarket())
                 .name(food.getName())
                 .price(food.getPrice())
                 .imagePath(food.getImagePath())

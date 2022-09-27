@@ -1,5 +1,6 @@
 package com.example.smart_waiting.market;
 
+import com.example.smart_waiting.market.model.FoodInfoInput;
 import com.example.smart_waiting.market.model.MarketDto;
 import com.example.smart_waiting.market.model.MarketInfoInput;
 import com.example.smart_waiting.market.model.MarketRegInput;
@@ -7,12 +8,10 @@ import com.example.smart_waiting.market.service.MarketService;
 import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.util.FileUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,14 +55,15 @@ public class MarketController {
         return "redirect:/market/info";
     }
 
-//    @PostMapping
-//    public String addFood(Model model, HttpServletRequest request,
-//                          MultipartFile file, FoodInfoInput parameter){
-//
-//        UserDto userDto = userService.findFromRequest(request);
-//
-//
-//
-//    }
+    @PostMapping("/add-food.do")
+    public @ResponseBody ResponseEntity<?>  addFood(Model model
+            , HttpServletRequest request, MultipartFile file, FoodInfoInput parameter){
+
+        String email = TokenUtil.findEmailFromRequest(request);
+        FileUtils.SetInputFileNames(file,parameter);
+        FoodDto foodDto = marketService.addFood(email,parameter);
+
+        return ResponseEntity.ok(foodDto);
+    }
 
 }

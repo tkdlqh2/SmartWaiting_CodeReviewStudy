@@ -1,5 +1,7 @@
 package com.example.smart_waiting.market.service;
 
+import com.example.smart_waiting.market.FoodDto;
+import com.example.smart_waiting.market.model.FoodInfoInput;
 import com.example.smart_waiting.market.model.MarketDto;
 import com.example.smart_waiting.market.model.MarketInfoInput;
 import com.example.smart_waiting.market.model.MarketRegInput;
@@ -13,4 +15,6 @@ public interface MarketService {
     void editInfo(String email, MarketInfoInput parameter);
 
     MarketDto findDtoFromEmail(String email);
+
+    FoodDto addFood(String email, FoodInfoInput parameter);
 }

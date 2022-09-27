@@ -1,9 +1,8 @@
 package com.example.smart_waiting.market.service;
 
 import com.example.smart_waiting.exception.MarketException;
-import com.example.smart_waiting.market.FoodRepository;
-import com.example.smart_waiting.market.Market;
-import com.example.smart_waiting.market.MarketRepository;
+import com.example.smart_waiting.market.*;
+import com.example.smart_waiting.market.model.FoodInfoInput;
 import com.example.smart_waiting.market.model.MarketDto;
 import com.example.smart_waiting.market.model.MarketInfoInput;
 import com.example.smart_waiting.market.model.MarketRegInput;
@@ -61,6 +60,21 @@ public class MarketServiceImpl implements MarketService{
         return MarketDto.of(findFromEmail(email));
     }
 
+    @Override
+    public FoodDto addFood(String email, FoodInfoInput parameter) {
+        Market market = findFromEmail(email);
+
+        Food food = Food.builder()
+                .name(parameter.getName())
+                .price(parameter.getPrice())
+                .imagePath(parameter.getImagePath())
+                .market(market)
+                .build();
+
+        return FoodDto.of(foodRepository.save(food));
+    }
+
+
     private Market findFromEmail(String email){
         User user = userRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("유저가 존재하지 않습니다. ->"+ email));
@@ -68,4 +82,5 @@ public class MarketServiceImpl implements MarketService{
         return marketRepository.findByUser(user).orElseThrow(
                 ()-> new MarketException(ErrorCode.NO_MARKET_USER));
     }
+
 }
