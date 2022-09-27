@@ -113,10 +113,6 @@ public class UserServiceImpl implements UserService{
         return UserDto.of(user);
     }
 
-    @Override
-    public String findEmailFromRequest(HttpServletRequest request) {
-        return TokenUtil.getEmail(TokenUtil.resolveTokenFromRequest(request));
-    }
 
     @Override
     public UserDto findFromEmail(String email) {

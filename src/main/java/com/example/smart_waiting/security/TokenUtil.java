@@ -51,4 +51,8 @@ public class TokenUtil {
 
         return null;
     }
+
+    public static String findEmailFromRequest(HttpServletRequest request) {
+        return TokenUtil.getEmail(TokenUtil.resolveTokenFromRequest(request));
+    }
 }

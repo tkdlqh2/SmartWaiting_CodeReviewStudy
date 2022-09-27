@@ -1,5 +1,6 @@
 package com.example.smart_waiting.user;
 
+import com.example.smart_waiting.security.TokenUtil;
 import com.example.smart_waiting.user.model.UserDto;
 import com.example.smart_waiting.user.model.UserInput;
 import com.example.smart_waiting.user.model.UserPasswordResetInput;
@@ -55,7 +56,7 @@ public class UserController {
 
     @GetMapping("/info")
     public String info(Model model, HttpServletRequest request){
-        String email = userService.findEmailFromRequest(request);
+        String email = TokenUtil.findEmailFromRequest(request);
         UserDto detail = userService.findFromEmail(email);
         model.addAttribute("detail",detail);
 
@@ -64,7 +65,7 @@ public class UserController {
 
     @PatchMapping("/info")
     public String infoEdit(Model model, HttpServletRequest request, UserInput parameter){
-        String email = userService.findEmailFromRequest(request);
+        String email = TokenUtil.findEmailFromRequest(request);
         try{
             userService.updateInfo(email, parameter);
         } catch (Exception e){
@@ -79,7 +80,7 @@ public class UserController {
 
     @PatchMapping("/password.do")
     public @ResponseBody ResponseEntity<?> passwordEdit(HttpServletRequest request, UserPasswordResetInput parameter){
-        String email = userService.findEmailFromRequest(request);
+        String email = TokenUtil.findEmailFromRequest(request);
         try{
             userService.updatePassword(email,parameter);
         } catch (Exception e){
