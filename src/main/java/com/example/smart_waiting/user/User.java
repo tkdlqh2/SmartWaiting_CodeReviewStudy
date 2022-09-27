@@ -1,5 +1,6 @@
 package com.example.smart_waiting.user;
 
+import com.example.smart_waiting.domain.ListStringConverter;
 import com.example.smart_waiting.type.UserStatus;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,7 +44,7 @@ public class User implements UserDetails {
     private UserStatus userStatus;
 
     @Column
-    @ElementCollection(targetClass = String.class)
+    @Convert(converter = ListStringConverter.class)
     private List<String> userRoles;
     private boolean isReserving;
 
