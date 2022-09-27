@@ -114,8 +114,12 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public UserDto findFromRequest(HttpServletRequest request) {
-        String email = TokenUtil.getEmail(TokenUtil.resolveTokenFromRequest(request));
+    public String findEmailFromRequest(HttpServletRequest request) {
+        return TokenUtil.getEmail(TokenUtil.resolveTokenFromRequest(request));
+    }
+
+    @Override
+    public UserDto findFromEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(
                 ()-> new UsernameNotFoundException("이메일이 없습니다. -> "+email));
         return UserDto.of(user);

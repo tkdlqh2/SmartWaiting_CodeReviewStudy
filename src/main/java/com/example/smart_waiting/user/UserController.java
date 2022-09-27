@@ -55,7 +55,8 @@ public class UserController {
 
     @GetMapping("/info")
     public String info(Model model, HttpServletRequest request){
-        UserDto detail = userService.findFromRequest(request);
+        String email = userService.findEmailFromRequest(request);
+        UserDto detail = userService.findFromEmail(email);
         model.addAttribute("detail",detail);
 
         return "user/info";
@@ -63,9 +64,9 @@ public class UserController {
 
     @PatchMapping("/info")
     public String infoEdit(Model model, HttpServletRequest request, UserInput parameter){
-        UserDto user = userService.findFromRequest(request);
+        String email = userService.findEmailFromRequest(request);
         try{
-            userService.updateInfo(user.getEmail(), parameter);
+            userService.updateInfo(email, parameter);
         } catch (Exception e){
             model.addAttribute("errorMessage",e.getMessage());
         }
@@ -78,9 +79,9 @@ public class UserController {
 
     @PatchMapping("/password.do")
     public @ResponseBody ResponseEntity<?> passwordEdit(HttpServletRequest request, UserPasswordResetInput parameter){
-        UserDto user = userService.findFromRequest(request);
+        String email = userService.findEmailFromRequest(request);
         try{
-            userService.updatePassword(user.getEmail(),parameter);
+            userService.updatePassword(email,parameter);
         } catch (Exception e){
             return ResponseEntity.ok(false);
         }

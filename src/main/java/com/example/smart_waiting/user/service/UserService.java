@@ -22,7 +22,9 @@ public interface UserService extends UserDetailsService {
 
     UserDto login(UserLoginInput parameter);
 
-    UserDto findFromRequest(HttpServletRequest request);
+    String findEmailFromRequest(HttpServletRequest request);
+
+    UserDto findFromEmail(String email);
 
     void updateInfo(String email,UserInput parameter);
 
